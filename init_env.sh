@@ -3,4 +3,4 @@
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install mypy isort ruff pytest pre-commit
+pip install mypy isort ruff pytest pre-commit flask
