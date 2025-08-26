@@ -18,7 +18,7 @@ CS7319_SW_Arch/
 ├── instructions/     # Course assignment instructions and PDFs
 ├── proposal/         # Project proposal documentation
 ├── dev-env/          # Development environment configuration
-├── init_env.sh       # Environment setup script
+│   └── init_env.sh   # Environment setup script
 ├── pyproject.toml    # Project configuration
 ├── README.md         # Project documentation
 └── LICENSE           # Project license (MIT)
@@ -26,7 +26,7 @@ CS7319_SW_Arch/
 
 ## Getting Started
 
-- Use the provided setup script (`init_env.sh`) to initialize your Python environment and install dependencies.
+- Use the provided setup script (`dev-env/init_env.sh`) to initialize your Python environment and install dependencies.
 - All code is primarily written in Python, with open source libraries as needed.
 
 ## Installation
@@ -37,7 +37,7 @@ To set up the Python virtual environment and install required libraries:
 1. Open a terminal and navigate to the project directory.
 2. Run:
    ```bash
-   bash init_env.sh
+   bash dev-env/init_env.sh
    ```
 
 ### Installed Libraries
@@ -137,7 +137,7 @@ This project is intended to be run exclusively on Linux or Windows Subsystem for
 - Open a terminal in VS Code (it will use WSL).
 - Run:
   ```bash
-  bash init_env.sh
+  bash dev-env/init_env.sh
   ```
 - This will create the virtual environment and install dependencies in WSL.
 

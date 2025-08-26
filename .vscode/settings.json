@@ -1,0 +1,21 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "none",
+    "python.linting.enabled": true,
+    "python.linting.ruffEnabled": true,
+    "python.linting.ruffPath": "${workspaceFolder}/.venv/bin/ruff",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/.venv/lib/python3.12/site-packages"
+    ],
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.venv": true,
+        "**/.ipynb_checkpoints": true,
+        "LICENSE": true
+    },
+    "files.trimTrailingWhitespace": true,
+    "[markdown]": {
+        "files.trimTrailingWhitespace": false
+    }
+}

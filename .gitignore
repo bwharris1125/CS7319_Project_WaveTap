@@ -23,7 +23,7 @@ env/
 .ipynb_checkpoints
 
 # VS Code
-.vscode/
+# .vscode/
 
 # OS files
 .DS_Store

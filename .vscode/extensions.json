@@ -1,0 +1,14 @@
+{
+  // Recommended extensions for this workspace. Install these to get full
+  // language, linting and WSL support for the project.
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-vscode-remote.remote-wsl",
+    "charliermarsh.ruff",
+    "njpwerner.autodocstring",
+    "streetsidesoftware.code-spell-checker",
+    "ms-azuretools.vscode-docker"
+  ],
+  "unwantedRecommendations": []
+}
