@@ -9,16 +9,19 @@ AI assistance (GitHub Copilot) was used to help with documentation and environme
 ## Project Structure
 
 ```
-VS_Workspace/
+CS7319_SW_Arch/
 ├── src/              # Main source code for reusable modules
-├── examples/         # In-class examples and sample code
-├── experiments/      # Experimentation and prototype code
-├── course_project/   # Main course project
+│   ├── sdr/          # Software Defined Radio modules
+│   ├── main.py       # Main application entry point
+│   └── README.md     # Source code documentation
 ├── tests/            # Unit and integration tests (pytest)
+├── instructions/     # Course assignment instructions and PDFs
+├── proposal/         # Project proposal documentation
+├── dev-env/          # Development environment configuration
+├── init_env.sh       # Environment setup script
 ├── pyproject.toml    # Project configuration
-├── .pre-commit-config.yaml # Pre-commit hooks configuration
 ├── README.md         # Project documentation
-├── LICENSE           # Project license (MIT)
+└── LICENSE           # Project license (MIT)
 ```
 
 ## Getting Started
@@ -43,23 +46,53 @@ The setup script will install the following Python libraries in the virtual envi
 - `isort` (import sorting)
 - `ruff` (linting and code quality)
 - `pytest` (testing framework)
-- `pre-commit` (automated code quality checks)
+- `pytest-cov` (test coverage)
 - `flask` (web application framework)
+- `pyrtlsdr` (RTL-SDR library for software defined radio)
+- `setuptools` (package development and distribution tools)
 
-## Pre-commit Hooks
+## RTL-SDR Setup
 
-This project uses [pre-commit](https://pre-commit.com/) to automate code quality checks. To enable pre-commit hooks:
+This project includes Software Defined Radio (SDR) functionality using RTL-SDR dongles. The setup script automatically installs the required system libraries.
 
-1. Install pre-commit (already included in setup script).
-2. Run the following command in your terminal:
-   ```bash
-   pre-commit install
+### WSL2 USB Device Setup
+If you're using WSL2 on Windows, you'll need to share your RTL-SDR USB device:
+
+1. **Install usbipd-win on Windows** (PowerShell as Administrator):
+   ```powershell
+   winget install usbipd
    ```
-3. Hooks for `black`, `isort`, `ruff`, and `mypy` will run automatically on each commit.
+
+2. **Find your RTL-SDR device**:
+   ```powershell
+   usbipd list
+   ```
+
+3. **Share and attach the device** (replace X-X with your device's bus ID):
+   ```powershell
+   usbipd bind --busid X-X
+   usbipd attach --wsl --busid X-X
+   ```
+
+4. **Verify in WSL**:
+   ```bash
+   lsusb | grep -i rtl
+   rtl_test -t
+   ```
 
 ## Usage
 
-_Provide examples and instructions for running code, scripts, or modules. If you use Flask, add instructions for running your Flask app here._
+### Running the SDR Application
+To run the main SDR application:
+```bash
+source .venv/bin/activate
+python src/main.py
+```
+
+### SDR Module
+The RTL-SDR functionality is located in `src/sdr/radio.py`. This module provides basic RTL-SDR configuration and testing capabilities.
+
+_Additional usage examples and instructions will be added as the project develops._
 
 ## Contributing
 
@@ -98,7 +131,7 @@ This project is intended to be run exclusively on Linux or Windows Subsystem for
 ### 3. Open Your Project in WSL
 - Open the Command Palette (`Ctrl+Shift+P`).
 - Type and select: `Remote-WSL: Open Folder in WSL`.
-- Choose your project folder (`VS_Workspace`).
+- Choose your project folder (`CS7319_SW_Arch`).
 
 ### 4. Set Up Your Python Environment in WSL
 - Open a terminal in VS Code (it will use WSL).
@@ -111,10 +144,9 @@ This project is intended to be run exclusively on Linux or Windows Subsystem for
 ### 5. Update VS Code Settings (Optional)
 - For Linux/WSL compatibility, set the Python interpreter path in `.vscode/settings.json`:
   ```json
-  "python.defaultInterpreterPath": ".venv/bin/python"
-  "python.analysis.extraPaths": [
-    ".venv/lib/python3.10/site-packages"
-  ]
+  {
+    "python.defaultInterpreterPath": ".venv/bin/python"
+  }
   ```
 
 You can now develop and run your project in a Linux environment using WSL, with all VS Code features.
