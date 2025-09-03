@@ -1,0 +1,11 @@
+flowchart LR
+  A[RTL-SDR Hardware] --> B[SDR Capture Service]
+  B -->|IQ Stream| C[(Message Bus)]
+  C --> D[ADS-B Decoder]
+  C --> E[FM Decoder]
+  D -->|Aircraft State| F[(Redis Cache)]
+  D -->|Historical Tracks| G[(Postgres)]
+  E -->|Audio Frames| H[API Gateway]
+  F --> H
+  G --> H
+  H --> I[Web UI / Clients]

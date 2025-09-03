@@ -1,0 +1,19 @@
+sequenceDiagram
+autonumber
+participant User
+participant UI
+participant API
+participant Arbiter as Coordinator
+participant Capture as SDR Capture
+participant Bus as Message Bus
+User->>UI: Select new frequency
+UI->>API: POST /tune { freq, span }
+API->>Arbiter: validateAndQueue()
+Arbiter->>Capture: applyTuning()
+Capture-->>Arbiter: ack + params
+Arbiter->>Bus: publish tuning event
+API-->>UI: 202 Accepted / ack
+Capture->>Bus: IQ frames (new center)
+Decoders->>Bus: Adjust filtering
+UI->>API: GET /status / subscribe WS
+API-->>UI: Updated passband + availability

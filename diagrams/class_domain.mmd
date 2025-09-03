@@ -1,0 +1,93 @@
+classDiagram
+
+class TuningRequest {
+  +uuid id
+  +float centerHz
+  +float spanHz
+  +List~string~ decoderIds
+  +datetime requestedAt
+  +string status
+  +validate()
+}
+
+class Arbiter {
+  -Queue~TuningRequest~ pending
+  +submit(req:TuningRequest)
+  +processNext()
+  +currentWindow():BandWindow
+}
+
+class BandWindow {
+  +float center
+  +float span
+  +fits(decoder:DecoderSpec):bool
+}
+
+class DecoderSpec {
+  +string id
+  +float requiredBandwidth
+  +float offsetHz
+}
+
+class IQFrame {
+  +int sequence
+  +bytes iData
+  +bytes qData
+  +float sampleRate
+  +timestamp ts
+}
+
+class DecoderBase {
+  <<abstract>>
+  +configure(window:BandWindow)
+  +consume(frame:IQFrame)
+  +emit()
+}
+
+class AdsbDecoder {
+  +crcOk(percent:float)
+  +parseDF(msg:bytes)
+}
+
+class FmDecoder {
+  +demodulate(frame:IQFrame)
+  +audioBuffer():bytes
+}
+
+class CaptureService {
+  -DeviceController device
+  +start()
+  +tune(center:float, sampleRate:float)
+  +stream():IQFrame
+}
+
+class DeviceController {
+  +open(serial:string)
+  +setFreq(freq:float)
+  +setGain(gain:float)
+  +setSampleRate(rate:float)
+}
+
+class StateRepository {
+  +updateAircraft(icao:string, state:AircraftState)
+  +latest(icao:string):AircraftState
+}
+
+class AircraftState {
+  +string icao
+  +float lat
+  +float lon
+  +int altitude
+  +int heading
+  +datetime lastSeen
+}
+
+Arbiter --> BandWindow
+Arbiter --> TuningRequest
+Arbiter --> DecoderSpec
+CaptureService --> DeviceController
+CaptureService --> IQFrame
+DecoderBase <|-- AdsbDecoder
+DecoderBase <|-- FmDecoder
+AdsbDecoder --> AircraftState
+StateRepository --> AircraftState
