@@ -35,6 +35,24 @@ else
 	echo "  rtl-sdr librtlsdr-dev librtlsdr2 libusb-1.0-0-dev usbutils pkg-config build-essential"
 fi
 
+# --- Install Node.js and Mermaid CLI (Linux) --- TODO TEST ME
+if [[ "$(uname -s)" == "Linux" ]]; then
+    if ! command -v npm >/dev/null 2>&1; then
+        echo "Node.js and npm are not installed. Installing Node.js..."
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+    else
+        echo "Node.js and npm are already installed."
+    fi
+
+    if ! command -v mmdc >/dev/null 2>&1; then
+        echo "Mermaid CLI is not installed. Installing Mermaid CLI..."
+        npm install -g @mermaid-js/mermaid-cli
+    else
+        echo "Mermaid CLI is already installed."
+    fi
+fi
+
 # --- Create and activate Python virtual environment ---
 cd "$PROJECT_ROOT"
 
