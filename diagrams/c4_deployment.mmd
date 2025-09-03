@@ -1,0 +1,29 @@
+C4Deployment
+title "WaveTap - Deployment (Containerized)"
+
+Deployment_Node(edge, "Edge Host", "Linux") {
+  Node(rtlsdr_usb, "RTL-SDR Dongle", "USB RF Frontend")
+  Node(cap_pod, "SDR Capture Pod", "Docker") {
+    Container(sdr_cap, "SDR Capture Service", "Python")
+  }
+}
+
+Deployment_Node(cluster, "K8s Cluster", "Cloud/On-Prem") {
+  Node(msg, "Message Bus", "NATS/Kafka")
+  Node(coord_pod, "Coordinator Pod", "Docker") { Container(coord, "Coordinator", "Go/Python") }
+  Node(dec_pod1, "Decoder Pod ADS-B", "Docker") { Container(dec_adsb, "ADS-B Decoder", "Python") }
+  Node(dec_pod2, "Decoder Pod FM", "Docker") { Container(dec_fm, "FM Decoder", "Python") }
+  Node(cache_pod, "Redis Pod", "Docker") { Container(cache, "Redis", "In-Memory") }
+  Node(db_pod, "Postgres Pod", "Docker") { Container(db, "Postgres", "RDBMS") }
+  Node(api_pod, "API Gateway Pod", "Docker") { Container(api, "API Gateway", "FastAPI") }
+  Node(ui_pod, "Web UI Pod", "Docker") { Container(ui, "Web UI", "React") }
+}
+
+Rel(cap_pod, msg, "Publishes IQ")
+Rel(dec_adsb, msg, "Subscribes IQ")
+Rel(dec_fm, msg, "Subscribes IQ")
+Rel(coord, cap_pod, "Tune commands")
+Rel(dec_adsb, cache, "Update states")
+Rel(api, cache, "Query live states")
+Rel(api, db, "Historical queries")
+Rel(ui, api, "HTTP/WebSocket")

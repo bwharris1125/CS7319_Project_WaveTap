@@ -1,0 +1,37 @@
+C4Context
+title "WaveTap - System Context"
+
+Enterprise_Boundary(b0, "Radio Frequencies") {
+    System_Ext(fm_radio, "FM Radio", "Broadcasts FM signals")
+    System_Ext(adsb_transmitter, "ADS-B Transmitter", "Broadcasts aircraft position data")
+    System_Ext(vhf_radio, "VHF Radio", "Broadcasts voice communication")
+}
+
+Enterprise_Boundary(b1, "WaveTap") {
+    System(wavetap, "WaveTap SDR Platform", "Processes and decodes RF signals")
+    System(data_storage, "Data Storage Service", "Stores decoded data for analysis")
+    System(ui_service, "UI Service", "Provides user interface for data visualization")
+}
+
+Enterprise_Boundary(b2, "Hardware and Libraries") {
+    System(rtl_sdr, "RTL-SDR", "Hardware for capturing RF signals")
+    System(pyrtlsdr, "pyrtlsdr", "Library for interfacing with RTL-SDR")
+    System(pymodes, "pymodes", "Library for decoding ADS-B signals")
+}
+
+Rel(fm_radio, rtl_sdr, "Broadcasts signals to", "down")
+Rel(adsb_transmitter, rtl_sdr, "Broadcasts signals to", "down")
+Rel(vhf_radio, rtl_sdr, "Broadcasts signals to", "down")
+Rel(rtl_sdr, wavetap, "Captures signals for", "right")
+Rel(pyrtlsdr, wavetap, "Provides interface for RTL-SDR", "right")
+Rel(pymodes, wavetap, "Decodes ADS-B signals for", "right")
+Rel(wavetap, data_storage, "Stores decoded data in", "down")
+Rel(data_storage, ui_service, "Provides data to", "right")
+Rel(ui_service, wavetap, "Interacts with", "up", "HTTPS/WebSocket")
+
+UpdateElementStyle(ui_service, $fontColor="red", $bgColor="grey", $borderColor="red")
+UpdateRelStyle(ui_service, wavetap, $textColor="blue", $lineColor="blue", $offsetX="5")
+UpdateRelStyle(rtl_sdr, wavetap, $textColor="blue", $lineColor="blue", $offsetY="-10")
+UpdateRelStyle(data_storage, ui_service, $textColor="blue", $lineColor="blue", $offsetY="-40", $offsetX="-50")
+
+UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
