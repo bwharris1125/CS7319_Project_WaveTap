@@ -1,4 +1,4 @@
-# CS7319 - Software Architecture  
+# WaveTap Project README (CS7319 - Software Architecture)
 
 Repository for SMU Software Architecture (Course CS7319) Class Project (WaveTap)
 
