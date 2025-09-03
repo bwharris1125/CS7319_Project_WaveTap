@@ -1,0 +1,27 @@
+@startuml C4-Container
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User / Client App", "Requests decoded data (REST, WebSocket)")
+
+Container(sdr, "SDR Capture Service", "Python + pyrtlsdr",
+    "Owns RTL-SDR hardware, streams raw IQ, exposes tuning API")
+
+Container(decoders, "Decoder Services", "Python + NumPy + pyModeS/etc.",
+    "Subscribe to IQ stream, apply software tuning, decode signals (ADS-B, FM, ATC, etc.)")
+
+Container(arbiter, "Coordinator / Arbiter", "Python + Redis",
+    "Manages tuning requests, ensures only one center frequency at a time")
+
+Container(api, "API Gateway", "FastAPI",
+    "Exposes decoded data via REST/WebSocket")
+
+ContainerDb(store, "Data Store", "Redis/Postgres",
+    "Stores last-seen aircraft states or audio streams")
+
+Rel(user, api, "Requests data from")
+Rel(api, store, "Reads/writes decoded data")
+Rel(decoders, store, "Publishes decoded results")
+Rel(decoders, sdr, "Subscribe to IQ stream")
+Rel(arbiter, sdr, "Controls tuning")
+Rel(api, arbiter, "Sends tuning requests via REST")
+@enduml
