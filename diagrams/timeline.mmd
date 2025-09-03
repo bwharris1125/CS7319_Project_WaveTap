@@ -1,0 +1,22 @@
+gantt
+    title WaveTap Timeline
+    dateFormat  YYYY-MM-DD
+    axisFormat  %m/%d
+    tickInterval 1week
+    section Planning
+    Proposal Document          :propDoc, 2025-08-29, 8d
+    Proposal Presentation      :propPres, 2025-09-04, 2d
+    Proposal Document          :milestone, prop, 2025-09-06, 0d
+    section Development
+    PyRtlSdr Interface         :pyrtl, 2025-08-16, 15d
+    ADS-B Decoder              :adsb, 2025-08-28, 12d
+    Containers                 :docker, after adsb, 7d
+    Scheduler                  :sched, after docker, 7d
+    Data Storage               :storage, after docker, 7d
+    API Interface              :api, after storage, 8d
+    section Finalization
+    Testing                    :testing, after storage, 10d
+    Final Documentation        :finalDoc, 2025-09-21, 12d
+    Final Presentation         :finalPres, 2025-09-29, 4d
+    Final Presentation Due     :milestone, pres, 2025-10-03, 0d
+    Final MVP Due              :milestone, mvp, 2025-10-03, 0d
