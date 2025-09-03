@@ -2,28 +2,59 @@ C4Deployment
 title "WaveTap - Deployment (Containerized)"
 
 Deployment_Node(edge, "Edge Host", "Linux") {
-  Node(rtlsdr_usb, "RTL-SDR Dongle", "USB RF Frontend")
-  Node(cap_pod, "SDR Capture Pod", "Docker") {
-    Container(sdr_cap, "SDR Capture Service", "Python")
-  }
+    Node(rtlsdr_usb, "RTL-SDR Dongle", "USB RF Frontend") {
+        Container(rtlsdr, "RTL-SDR Hardware", "Captures RF signals")
+    }
+    Node(cap_pod, "SDR Capture Pod", "Docker") {
+        Container(sdr_cap, "SDR Capture Service", "Python", "Processes RF signals and publishes IQ data")
+    }
 }
 
-Deployment_Node(cluster, "K8s Cluster", "Cloud/On-Prem") {
-  Node(msg, "Message Bus", "NATS/Kafka")
-  Node(coord_pod, "Coordinator Pod", "Docker") { Container(coord, "Coordinator", "Go/Python") }
-  Node(dec_pod1, "Decoder Pod ADS-B", "Docker") { Container(dec_adsb, "ADS-B Decoder", "Python") }
-  Node(dec_pod2, "Decoder Pod FM", "Docker") { Container(dec_fm, "FM Decoder", "Python") }
-  Node(cache_pod, "Redis Pod", "Docker") { Container(cache, "Redis", "In-Memory") }
-  Node(db_pod, "Postgres Pod", "Docker") { Container(db, "Postgres", "RDBMS") }
-  Node(api_pod, "API Gateway Pod", "Docker") { Container(api, "API Gateway", "FastAPI") }
-  Node(ui_pod, "Web UI Pod", "Docker") { Container(ui, "Web UI", "React") }
+Deployment_Node(standalone, "Docker Server", "Linux") {
+    Node(msg, "Message Bus", "NATS/Kafka") {
+        Container(msg_bus, "Message Bus", "Handles IQ data streams")
+    }
+    Node(coord_pod, "Coordinator Pod", "Docker") {
+        Container(coord, "Coordinator", "Go/Python", "Manages signal tuning and processing coordination")
+    }
+    Node(dec_pod1, "Decoder Pod ADS-B", "Docker") {
+        Container(dec_adsb, "ADS-B Decoder", "Python", "Decodes ADS-B signals")
+    }
+    Node(dec_pod2, "Decoder Pod FM", "Docker") {
+        Container(dec_fm, "FM Decoder", "Python", "Decodes FM signals")
+    }
+    Node(cache_pod, "Redis Pod", "Docker") {
+        Container(cache, "Redis", "In-Memory", "Caches live state data")
+    }
+    Node(db_pod, "Postgres Pod", "Docker") {
+        ContainerDb(db, "Postgres", "Relational Database", "Stores historical data and user information")
+    }
+    Node(api_pod, "API Gateway Pod", "Docker") {
+        Container(api, "API Gateway", "FastAPI", "Provides API access to clients")
+        Container(ext_api, "External API Client", "Python", "Interacts with external machine's API")
+    }
 }
 
-Rel(cap_pod, msg, "Publishes IQ")
-Rel(dec_adsb, msg, "Subscribes IQ")
-Rel(dec_fm, msg, "Subscribes IQ")
-Rel(coord, cap_pod, "Tune commands")
-Rel(dec_adsb, cache, "Update states")
-Rel(api, cache, "Query live states")
-Rel(api, db, "Historical queries")
-Rel(ui, api, "HTTP/WebSocket")
+Deployment_Node(local, "Local Windows Host", "Windows 10/11") {
+    Node(ui_dev, "UI Development Environment", "Python") {
+        Container(ui, "Local GUI", "Python", "Provides user interface for data visualization")
+    }
+}
+
+Rel(rtlsdr, sdr_cap, "Captures signals for")
+Rel(sdr_cap, msg_bus, "Publishes IQ data to")
+Rel(dec_adsb, msg_bus, "Subscribes to IQ data")
+Rel(dec_fm, msg_bus, "Subscribes to IQ data")
+Rel(coord, sdr_cap, "Sends tuning commands to")
+Rel(dec_adsb, cache, "Updates live state data in")
+Rel(api, cache, "Queries live state data from")
+Rel(api, db, "Reads from and writes to")
+Rel(ui, api, "Interacts with", "HTTP/WebSocket")
+Rel(api, ext_api, "Delegates external requests to")
+Rel(ext_api, msg_bus, "Publishes processed data to")
+
+%% UpdateRelStyle(sdr_cap, msg_bus, $offsetY="-40")
+%% UpdateRelStyle(dec_adsb, msg_bus, $offsetY="-40")
+%% UpdateRelStyle(api, cache, $offsetY="-20", $offsetX="5")
+%% UpdateRelStyle(api, db, $offsetX="-40", $offsetY="-20")
+%% UpdateRelStyle(ui, api, $offsetY="-10")

@@ -13,7 +13,7 @@ Container_Boundary(coord, "Coordinator / Arbiter") {
   Component(notify, "EventPublisher", "Bus Client", "Publishes tuning events")
 }
 
-Container_Ext(bus, "Message Bus", "Kafka/NATS")
+Container_Ext(bus, "Message Bus", "Docker Network")
 Container_Ext(api, "API Gateway", "REST/WebSocket")
 
 Rel(api, tun_mgr, "POST /tune", "JSON")
