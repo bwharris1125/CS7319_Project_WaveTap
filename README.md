@@ -17,6 +17,9 @@ CS7319_SW_Arch/
 ├── tests/            # Unit and integration tests (pytest)
 ├── instructions/     # Course assignment instructions and PDFs
 ├── proposal/         # Project proposal documentation
+├── diagrams/         # System architecture diagrams (Mermaid)
+├── tools/            # Utility scripts and tools
+│   └── adsb_rtlsdr_pymodes.py # ADS-B decoding utility
 ├── dev-env/          # Development environment configuration
 │   └── init_env.sh   # Environment setup script
 ├── pyproject.toml    # Project configuration
@@ -47,7 +50,8 @@ The setup script will install the following Python libraries in the virtual envi
 - `ruff` (linting and code quality)
 - `pytest` (testing framework)
 - `pytest-cov` (test coverage)
-- `flask` (web application framework)
+- `fastapi` (web application framework)
+- `httpx` (HTTP client for external API communication)
 - `pyrtlsdr` (RTL-SDR library for software defined radio)
 - `setuptools` (package development and distribution tools)
 
@@ -91,6 +95,9 @@ python src/main.py
 
 ### SDR Module
 The RTL-SDR functionality is located in `src/sdr/radio.py`. This module provides basic RTL-SDR configuration and testing capabilities.
+
+### Diagrams
+System architecture diagrams are located in the `diagrams/` folder. Use the Mermaid VS Code extension to view or edit these diagrams.
 
 _Additional usage examples and instructions will be added as the project develops._
 
