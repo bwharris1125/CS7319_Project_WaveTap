@@ -20,14 +20,14 @@ Deployment_Node(standalone, "Docker Server", "Linux") {
     Node(dec_pod1, "Decoder Pod ADS-B", "Docker") {
         Container(dec_adsb, "ADS-B Decoder", "Python", "Decodes ADS-B signals")
     }
-    Node(dec_pod2, "Decoder Pod FM", "Docker") {
-        Container(dec_fm, "FM Decoder", "Python", "Decodes FM signals")
+    Node(dec_pod2, "Alternate Decoder Pod", "Docker") {
+        Container(dec_fm, "Future Decoder", "Python", "Decodes other RF signal")
     }
     Node(cache_pod, "Redis Pod", "Docker") {
         Container(cache, "Redis", "In-Memory", "Caches live state data")
     }
-    Node(db_pod, "Postgres Pod", "Docker") {
-        ContainerDb(db, "Postgres", "Relational Database", "Stores historical data and user information")
+    Node(db_pod, "Database Pod", "Docker") {
+        ContainerDb(db, "Postgres*", "Relational Database", "Stores historical data and user information")
     }
     Node(api_pod, "API Gateway Pod", "Docker") {
         Container(api, "API Gateway", "FastAPI", "Provides API access to clients")
@@ -36,7 +36,7 @@ Deployment_Node(standalone, "Docker Server", "Linux") {
 }
 
 Deployment_Node(local, "Local Windows Host", "Windows 10/11") {
-    Node(ui_dev, "UI Development Environment", "Python") {
+    Node(ui_dev, "UI Environment", "Python") {
         Container(ui, "Local GUI", "Python", "Provides user interface for data visualization")
     }
 }
@@ -52,9 +52,3 @@ Rel(api, db, "Reads from and writes to")
 Rel(ui, api, "Interacts with", "HTTP/WebSocket")
 Rel(api, ext_api, "Delegates external requests to")
 Rel(ext_api, msg_bus, "Publishes processed data to")
-
-%% UpdateRelStyle(sdr_cap, msg_bus, $offsetY="-40")
-%% UpdateRelStyle(dec_adsb, msg_bus, $offsetY="-40")
-%% UpdateRelStyle(api, cache, $offsetY="-20", $offsetX="5")
-%% UpdateRelStyle(api, db, $offsetX="-40", $offsetY="-20")
-%% UpdateRelStyle(ui, api, $offsetY="-10")

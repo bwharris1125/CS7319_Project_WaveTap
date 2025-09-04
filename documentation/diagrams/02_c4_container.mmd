@@ -1,9 +1,12 @@
 C4Container
 title "WaveTap - Container View"
 
-Person(user, "Client User", "Browser / Dashboard / CLI")
 
 System_Ext(aircraft, "Aircraft", "Broadcasts ADS-B and Voice Signals")
+System_Ext(rf_source, "RF Source", "Broadcasts RF Signals (ex. FM Radio)")
+
+Person(user, "Client User", "Browser / Dashboard / CLI")
+
 
 System_Boundary(wt, "WaveTap") {
   Container(sdr_cap, "SDR Capture Service", "Python + pyrtlsdr", "Owns RTL-SDR; streams IQ")
@@ -11,13 +14,15 @@ System_Boundary(wt, "WaveTap") {
   Container(api, "API Gateway", "FastAPI/Express", "REST + WebSocket aggregation")
   Container(ui, "Local UI / Dashboard", "Python/TKinter", "Tables, maps, streams")
   Container(dec_adsb, "ADS-B Decoder Service", "Python", "Decodes Mode-S / ADS-B messages")
-  Container(dec_fm, "FM Decoder Service", "Python", "Demodulates narrowband FM audio")
+  ContainerDb(db, "Persistent Store", "CSV", "Historical tracks, logs")
   Container(dec_atc, "ATC Voice Decoder", "Python", "Optional voice channel decode")
-  Container(db, "Persistent Store", "CSV", "Historical tracks, logs")
+  Container(dec_fm, "Alternative Decoder Service", "Python", "Future SDR decoder capability")
+
 }
 
-Rel(aircraft, sdr_cap, "Broadcasts ADS-B and Voice Signals")
-Rel(user, ui, "Uses", "HTTPS")
+Rel(aircraft, sdr_cap, "ADS-B and VHF Voice Signals")
+Rel(rf_source, sdr_cap, "RF Signals")
+Rel(user, ui, "Uses", "WebSocket/REST")
 Rel(ui, api, "Calls", "REST")
 Rel(api, arb, "Requests tuning", "REST")
 Rel(arb, sdr_cap, "Issues tuning commands", "REST")
@@ -25,3 +30,6 @@ Rel(sdr_cap, dec_adsb, "Streams IQ data")
 Rel(sdr_cap, dec_fm, "Streams audio frames", "WebSocket")
 Rel(dec_adsb, db, "Persists tracks", "Logs")
 Rel(dec_fm, api, "Streams audio frames", "WebSocket")
+Rel(api, db, "Reads detected aircraft", "WebSocket")
+Rel(sdr_cap, dec_atc, "Voice Stream", "Mp3 stream")
+Rel(dec_atc, api, "Streams audio frames", "WebSocket")

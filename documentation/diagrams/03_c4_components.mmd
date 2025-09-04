@@ -1,9 +1,16 @@
 C4Component
 title "WaveTap - Components"
 
+Container_Ext(bus, "Message Bus", "Web Socket")
+Container_Ext(api, "API Gateway", "REST/WebSocket")
+
+Container_Boundary(gui, "User Interface") {
+  Component(py_ui, "Tkinter UI", "Web Socket", "User interface and graphical map of received signals")
+}
+
 Container_Boundary(cap, "SDR Capture Service") {
   Component(dev_ctrl, "DeviceController", "Python", "Manages RTL-SDR open/close/gain/sample rate")
-  Component(streamer, "IQStreamer", "Python Async", "Pushes IQ frames to bus")
+  Component(streamer, "IQStreamer", "Web Socket", "Pushes IQ frames to bus")
   Component(stat_mon, "StatusMonitor", "Python", "Health, metrics, overload detection")
 }
 
@@ -13,9 +20,7 @@ Container_Boundary(coord, "Coordinator / Arbiter") {
   Component(notify, "EventPublisher", "Bus Client", "Publishes tuning events")
 }
 
-Container_Ext(bus, "Message Bus", "Docker Network")
-Container_Ext(api, "API Gateway", "REST/WebSocket")
-
+Rel(py_ui, api, "GET /status, WS /events", "JSON")
 Rel(api, tun_mgr, "POST /tune", "JSON")
 Rel(tun_mgr, bw_alloc, "Checks proposed center & span")
 Rel(bw_alloc, dev_ctrl, "Approve & apply", "Command")
