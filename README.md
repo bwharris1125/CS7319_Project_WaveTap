@@ -1,10 +1,13 @@
-# WaveTap Project README (CS7319 - Software Architecture)
+# WaveTap SDR Utilities (CS7319 - Software Architecture)
 
-Repository for SMU Software Architecture (Course CS7319) Class Project (WaveTap)
-<p align="left">
+Repository for SMU Software Architecture (Course CS7319) Class Project
+<p align="center">
    <img src="documentation/wavetap_icon.png" 
    alt="WaveTap Logo" width="200"/>
 </p>
+<div style="text-align: center;">
+    ADS-B and SDR Utilities
+</div>
 
 ## Project Structure
 ```
