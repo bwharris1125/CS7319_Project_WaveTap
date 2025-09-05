@@ -11,7 +11,7 @@ brief description and its corresponding visualization.
 **Description**: The system context diagram provides an overview of the system's 
 boundaries, external systems, and users interacting with it.
 
-![System Context Diagram](diagrams_output/01_c4_system_context.png)
+![System Context Diagram](diagrams/img_output/01_c4_system_context.png)
 
 ---
 
@@ -20,7 +20,7 @@ boundaries, external systems, and users interacting with it.
 **Description**: The container diagram provides a high-level view of the system,
  showing the major containers (applications, services, and databases) and their interactions.
 
-![Container Diagram](diagrams_output/02_c4_container.png)
+![Container Diagram](diagrams/img_output/02_c4_container.png)
 
 ---
 
@@ -30,7 +30,7 @@ boundaries, external systems, and users interacting with it.
 the SDR Capture Service and Coordinator/Arbiter, showing the key components and
 their interactions.
 
-![Component Diagram](diagrams_output/03_c4_components.png)
+![Component Diagram](diagrams/img_output/03_c4_components.png)
 
 ---
 
@@ -39,7 +39,7 @@ their interactions.
 **Description**: The deployment diagram shows the physical deployment of the 
 system, including the nodes, pods, and containers used in the architecture.
 
-![Deployment Diagram](diagrams_output/04_c4_deployment.png)
+![Deployment Diagram](diagrams/img_output/04_c4_deployment.png)
 
 ---
 
@@ -48,7 +48,7 @@ system, including the nodes, pods, and containers used in the architecture.
 **Description**: The class diagram represents the domain model, showing the key 
 classes and their relationships.
 
-![Class Diagram](diagrams_output/class_domain.png)
+![Class Diagram](diagrams/img_output/class_domain.png)
 
 ---
 
@@ -57,7 +57,7 @@ classes and their relationships.
 **Description**: The data flow diagram illustrates the flow of data between the 
 system's components, including the SDR, decoders, and storage.
 
-![Data Flow Diagram](diagrams_output/flow_data.png)
+![Data Flow Diagram](diagrams/img_output/flow_data.png)
 
 ---
 
@@ -66,7 +66,7 @@ system's components, including the SDR, decoders, and storage.
 **Description**: The sequence diagram shows the interactions between the user, 
 UI, API, and backend components during a typical operation.
 
-![Sequence Diagram](diagrams_output/sequence_sdr_tuning.png)
+![Sequence Diagram](diagrams/img_output/sequence_sdr_tuning.png)
 
 ---
 
@@ -75,7 +75,7 @@ UI, API, and backend components during a typical operation.
 **Description**: The timeline diagram provides gantt chart as a chronological 
 view of the project's milestones and key events.
 
-![Timeline Diagram](diagrams_output/timeline.png)
+![Timeline Diagram](diagrams/img_output/timeline.png)
 
 ---
 
