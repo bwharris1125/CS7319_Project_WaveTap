@@ -1,3 +1,6 @@
+# Temp Files
+~$*
+
 # Python
 __pycache__/
 *.py[cod]
