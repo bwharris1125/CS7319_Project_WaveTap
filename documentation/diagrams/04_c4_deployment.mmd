@@ -2,51 +2,56 @@ C4Deployment
 title "WaveTap - Deployment (Containerized)"
 
 Deployment_Node(edge, "Edge Host", "Linux") {
-    Node(rtlsdr_usb, "RTL-SDR Dongle", "USB RF Frontend") {
-    Container(sdr, "USB RTL-SDR", "Software Defined Radio (SDR)")
+    Node(rtlsdr_usb, "RTL-SDR Dongle", "Ext. Hardware") {
+    System_Ext(sdr, "USB RTL-SDR", "Software Defined Radio (SDR)")
     }
     Node(cap_pod, "SDR Capture Pod", "Docker") {
-        Container(sdr_cap, "SDR Capture Service", "Python", "Processes RF signals and publishes IQ data")
+        Component(pyrtlsdr, "pyrtlsdr", "Python", "RTL-SDR Interface Library")
+        Component(pymodes, "PyModeS", "Python", "ADS-B Decoding Library")
+        Component(sdr_cap, "SDR Capture Service", "Python", "Recieve RF & Provide IQ")
     }
 }
 
 Deployment_Node(local, "Local Windows Host", "Windows 10/11") {
     Node(ui_dev, "UI Environment", "Python") {
-        Container(ui, "Local GUI", "Python", "Provides user interface for data visualization")
+        Container(ui, "Local GUI", "Python", "Provides UI & Data Display")
     }
 }
 
-Deployment_Node(standalone, "Docker Server", "Linux") {
-    Node(msg, "Message Bus", "NATS/Kafka") {
-        Container(msg_bus, "Message Bus", "Handles IQ data streams")
-    }
+Deployment_Node(standalone, "Processing Server", "Linux") {
+    %% Node(msg, "Message Bus", "NATS/Kafka") {
+    %%     Component(msg_bus, "Message Bus", "Handles IQ data streams")
+    %% } %% TODO: evaluate if this is needed on diagram or if this is what makes sense to use
     Node(coord_pod, "Coordinator Pod", "Docker") {
-        Container(arb, "Coordinator / Arbiter", "Python", "Manages tuning, decoding, and events")
+        Component(arb, "Coordinator / Arbiter", "Python", "Manages SDR Control")
+        Component(dec_adsb, "ADS-B Decoder", "Python", "Decodes ADS-B signals")
+        Component(dec_fm, "Future Decoder", "Python", "Decodes other RF signal")
     }
-    Node(dec_pod1, "Decoder Pod ADS-B", "Docker") {
-        Container(dec_adsb, "ADS-B Decoder", "Python", "Decodes ADS-B signals")
-    }
-    Node(dec_pod2, "Alternate Decoder Pod", "Docker") {
-        Container(dec_fm, "Future Decoder", "Python", "Decodes other RF signal")
-    }
-    Node(cache_pod, "Redis Pod", "Docker") {
-        Container(cache, "Redis", "In-Memory", "Caches live state data")
-    }
-    Node(db_pod, "Database Pod", "Docker") {
-        ContainerDb(db, "Storage Database", "SQL", "Historical tracks, logs")
-    }
-    Node(api_pod, "API Gateway Pod", "Docker") {
+    Node(db_pod, "API/Database Pod", "Docker") {
         Component(api, "API Gateway", "FastAPI", "Provides API access to clients")
+        ComponentDb(db, "Storage Database", "SQL", "Historical tracks, logs")
     }
 }
 
 
-Rel(sdr, sdr_cap, "USB connection to")
-Rel(sdr_cap, msg_bus, "Publishes IQ data to")
-Rel(dec_adsb, msg_bus, "Subscribes to IQ data")
-Rel(dec_fm, msg_bus, "Subscribes to IQ data")
-Rel(arb, sdr_cap, "Sends tuning commands to")
-Rel(dec_adsb, cache, "Updates live state data in")
-Rel(api, cache, "Queries live state data from")
+Rel(sdr, sdr_cap, "command and status")
+Rel(sdr, pyrtlsdr, "USB connection to")
+Rel(pyrtlsdr, sdr_cap, "sends IQ stream")
+Rel(pyrtlsdr, pymodes, "sends IQ stream")
+Rel(pymodes, sdr_cap, "sends decoded ADS-B data to")
+
+%% Rel(sdr_cap, msg_bus, "Publishes IQ data to")
+%% Rel(dec_adsb, msg_bus, "Subscribes to IQ data")
+%% Rel(dec_fm, msg_bus, "Subscribes to IQ data")
+
+Rel(sdr_cap, api, "sends decoded data to")
 Rel(api, db, "Reads from and writes to")
+Rel(api, arb, "Controls SDR", "REST")
 Rel(ui, api, "Interacts with", "HTTP/WebSocket")
+
+Rel(arb, sdr_cap, "Sends tuning commands to")
+Rel(arb, dec_fm, "Sends IQ stream")
+Rel(arb, dec_adsb, "Sends IQ stream")
+
+Rel(dec_adsb, api, "Provides decoded data to", "REST")
+Rel(dec_fm, api, "Provides decoded data to", "REST")
