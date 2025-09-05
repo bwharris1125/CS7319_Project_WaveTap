@@ -2,7 +2,7 @@
 
 # Directory containing Mermaid diagrams
 diagrams_dir="$(dirname "$0")/diagrams"
-output_dir="$(dirname "$0")/diagrams_output"
+output_dir="$(dirname "$0")/diagrams/img_output"
 
 # Ensure the output directory exists
 mkdir -p "$output_dir"
