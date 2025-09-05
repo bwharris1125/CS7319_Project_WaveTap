@@ -1,35 +1,40 @@
 C4Container
 title "WaveTap - Container View"
 
+Person(user, "Client User", "Browser / Dashboard / CLI")
 
 System_Ext(aircraft, "Aircraft", "Broadcasts ADS-B and Voice Signals")
 System_Ext(rf_source, "RF Source", "Broadcasts RF Signals (ex. FM Radio)")
 
-Person(user, "Client User", "Browser / Dashboard / CLI")
-
-
 System_Boundary(wt, "WaveTap") {
-  Container(sdr_cap, "SDR Capture Service", "Python + pyrtlsdr", "Owns RTL-SDR; streams IQ")
-  Container(arb, "Coordinator / Arbiter", "Go/Python", "Serializes tuning; allocates bandwidth window")
-  Container(api, "API Gateway", "FastAPI/Express", "REST + WebSocket aggregation")
   Container(ui, "Local UI / Dashboard", "Python/TKinter", "Tables, maps, streams")
-  Container(dec_adsb, "ADS-B Decoder Service", "Python", "Decodes Mode-S / ADS-B messages")
-  ContainerDb(db, "Persistent Store", "CSV", "Historical tracks, logs")
-  Container(dec_atc, "ATC Voice Decoder", "Python", "Optional voice channel decode")
-  Container(dec_fm, "Alternative Decoder Service", "Python", "Future SDR decoder capability")
-
+  Container(api, "API Gateway", "FastAPI/Express", "REST + WebSocket aggregation")
+  Container(arb, "Coordinator / Arbiter", "Python", "Manages tuning, decoding, events")
+  Container(sdr_cap, "SDR Capture Service", "Python + pyrtlsdr", "Owns RTL-SDR; streams IQ")
+  ContainerDb(db, "Storage Database", "SQL", "Historical tracks, logs")
 }
 
-Rel(aircraft, sdr_cap, "ADS-B and VHF Voice Signals")
-Rel(rf_source, sdr_cap, "RF Signals")
-Rel(user, ui, "Uses", "WebSocket/REST")
-Rel(ui, api, "Calls", "REST")
-Rel(api, arb, "Requests tuning", "REST")
-Rel(arb, sdr_cap, "Issues tuning commands", "REST")
-Rel(sdr_cap, dec_adsb, "Streams IQ data")
-Rel(sdr_cap, dec_fm, "Streams audio frames", "WebSocket")
-Rel(dec_adsb, db, "Persists tracks", "Logs")
-Rel(dec_fm, api, "Streams audio frames", "WebSocket")
-Rel(api, db, "Reads detected aircraft", "WebSocket")
-Rel(sdr_cap, dec_atc, "Voice Stream", "Mp3 stream")
-Rel(dec_atc, api, "Streams audio frames", "WebSocket")
+System_Boundary(hw, "Hardware & Libraries") {
+  System_Ext(sdr, "USB RTL-SDR", "Software Defined Radio (SDR)")
+  System_Ext(pymodes, "pyModeS", "Library for decoding ADS-B signals")
+  System_Ext(pyrtlsdr, "pyRTLSDR", "Library for interfacing with RTL-SDR")
+}
+
+Rel(aircraft, sdr, "ADS-B and VHF")
+Rel(rf_source, sdr, "RF Signals")
+Rel(sdr, sdr_cap, "USB Connection")
+Rel(sdr_cap, pymodes, "Uses")
+Rel(sdr_cap, pyrtlsdr, "Uses")
+Rel(user, ui, "Uses")
+Rel(ui, api, "Uses")
+Rel(api, arb, "Requests tuning")
+Rel(arb, sdr_cap, "tuning commands")
+Rel(sdr_cap, arb, "IQ stream")
+Rel(sdr_cap, db, "Persists tracks", "Logs")
+Rel(db, api, "Provides historical data")
+%% Rel(dec_fm, api, "Streams audio frames", "WebSocket")
+%% Rel(api, db, "Reads detected aircraft", "WebSocket")
+%% Rel(sdr_cap, dec_atc, "Voice Stream", "Mp3 stream")
+%% Rel(dec_atc, api, "Streams audio frames", "WebSocket")
+%% Rel(sdr_cap, dec_adsb, "Streams IQ data")
+%% Rel(sdr_cap, dec_fm, "Streams audio frames", "WebSocket")

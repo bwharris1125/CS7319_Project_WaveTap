@@ -1,30 +1,38 @@
 C4Component
 title "WaveTap - Components"
 
-Container_Ext(bus, "Message Bus", "Web Socket")
-Container_Ext(api, "API Gateway", "REST/WebSocket")
 
 Container_Boundary(gui, "User Interface") {
-  Component(py_ui, "Tkinter UI", "Web Socket", "User interface and graphical map of received signals")
+  Component(py_ui, "Tkinter UI", "Web Socket", "UI &  Data Display")
+}
+
+Container_Boundary(gateway, "API Gateway") {
+  Component(api, "API Gateway", "REST/WebSocket")
 }
 
 Container_Boundary(cap, "SDR Capture Service") {
-  Component(dev_ctrl, "DeviceController", "Python", "Manages RTL-SDR open/close/gain/sample rate")
-  Component(streamer, "IQStreamer", "Web Socket", "Pushes IQ frames to bus")
+  Component(dev_ctrl, "DeviceController", "Python", "Manages RTL-SDR")
   Component(stat_mon, "StatusMonitor", "Python", "Health, metrics, overload detection")
+  Component(streamer, "IQStreamer", "Web Socket", "Pushes IQ frames to bus")
 }
 
 Container_Boundary(coord, "Coordinator / Arbiter") {
-  Component(tun_mgr, "TuningManager", "Logic", "Validates & serializes tuning changes")
-  Component(bw_alloc, "BandwidthAllocator", "Logic", "Checks decoders fit inside passband")
+  Component(sdr_dec, "SDRDecoder", "Logic", "Decodes IQ frames from bus")
   Component(notify, "EventPublisher", "Bus Client", "Publishes tuning events")
+  Component(tun_mgr, "TuningManager", "Logic", "Validates & serializes tuning changes")
+}
+
+Container_Boundary(database, "Storage Database") {
+  ComponentDb(db, "Database", "SQL", "Stores historical data and logs")
 }
 
 Rel(py_ui, api, "GET /status, WS /events", "JSON")
 Rel(api, tun_mgr, "POST /tune", "JSON")
-Rel(tun_mgr, bw_alloc, "Checks proposed center & span")
-Rel(bw_alloc, dev_ctrl, "Approve & apply", "Command")
-Rel(dev_ctrl, streamer, "Configured RF params")
-Rel(streamer, bus, "Publish IQ")
-Rel(notify, bus, "Publish tuning event")
-Rel(stat_mon, api, "Health /metrics", "Pull/Push")
+Rel(tun_mgr, dev_ctrl, "Sends tuning commands")
+Rel(dev_ctrl, streamer, "Configures RF parameters")
+Rel(streamer, sdr_dec, "Streams IQ frames to decoder", "IQ frames")
+Rel(sdr_dec, db, "Persists decoded tracks and logs", "SQL")
+Rel(db, api, "Provides historical data", "SQL")
+Rel(stat_mon, api, "Exposes health/metrics", "Pull/Push")
+Rel(sdr_dec, notify, "Publishes detection events", "Bus/WebSocket")
+Rel(tun_mgr, notify, "Publishes tuning events", "Bus/WebSocket")

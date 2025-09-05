@@ -37,12 +37,18 @@ detect_chrome() {
 
 detect_chrome
 
+# Default rendering size (landscape-preferred). Can be overridden by env vars:
+# MMDC_WIDTH, MMDC_HEIGHT, MMDC_SCALE
+MMDC_WIDTH=1400
+MMDC_HEIGHT=800
+MMDC_SCALE=1
+
 # Generate PNG files for each Mermaid diagram
 for file in "$diagrams_dir"/*.mmd; do
     if [ -f "$file" ]; then
         output_file="$output_dir/$(basename "${file%.mmd}.png")"
-        echo "Generating $output_file from $file"
-        mmdc -i "$file" -o "$output_file"
+        echo "Generating $output_file from $file (width=${MMDC_WIDTH}, height=${MMDC_HEIGHT}, scale=${MMDC_SCALE})"
+        mmdc -i "$file" -o "$output_file" -w "$MMDC_WIDTH" -H "$MMDC_HEIGHT" -s "$MMDC_SCALE"
     fi
 done
 

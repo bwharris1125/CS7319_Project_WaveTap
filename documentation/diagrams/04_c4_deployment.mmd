@@ -3,7 +3,7 @@ title "WaveTap - Deployment (Containerized)"
 
 Deployment_Node(edge, "Edge Host", "Linux") {
     Node(rtlsdr_usb, "RTL-SDR Dongle", "USB RF Frontend") {
-        Container(rtlsdr, "RTL-SDR Hardware", "Captures RF signals")
+    Container(sdr, "USB RTL-SDR", "Software Defined Radio (SDR)")
     }
     Node(cap_pod, "SDR Capture Pod", "Docker") {
         Container(sdr_cap, "SDR Capture Service", "Python", "Processes RF signals and publishes IQ data")
@@ -21,7 +21,7 @@ Deployment_Node(standalone, "Docker Server", "Linux") {
         Container(msg_bus, "Message Bus", "Handles IQ data streams")
     }
     Node(coord_pod, "Coordinator Pod", "Docker") {
-        Container(coord, "Coordinator", "Go/Python", "Manages signal tuning and processing coordination")
+        Container(arb, "Coordinator / Arbiter", "Python", "Manages tuning, decoding, and events")
     }
     Node(dec_pod1, "Decoder Pod ADS-B", "Docker") {
         Container(dec_adsb, "ADS-B Decoder", "Python", "Decodes ADS-B signals")
@@ -33,23 +33,20 @@ Deployment_Node(standalone, "Docker Server", "Linux") {
         Container(cache, "Redis", "In-Memory", "Caches live state data")
     }
     Node(db_pod, "Database Pod", "Docker") {
-        ContainerDb(db, "Postgres*", "Relational Database", "Stores historical data and user information")
+        ContainerDb(db, "Storage Database", "SQL", "Historical tracks, logs")
     }
     Node(api_pod, "API Gateway Pod", "Docker") {
-        Container(api, "API Gateway", "FastAPI", "Provides API access to clients")
-        Container(ext_api, "External API Client", "Python", "Interacts with external machine's API")
+        Component(api, "API Gateway", "FastAPI", "Provides API access to clients")
     }
 }
 
 
-Rel(rtlsdr, sdr_cap, "Captures signals for")
+Rel(sdr, sdr_cap, "USB connection to")
 Rel(sdr_cap, msg_bus, "Publishes IQ data to")
 Rel(dec_adsb, msg_bus, "Subscribes to IQ data")
 Rel(dec_fm, msg_bus, "Subscribes to IQ data")
-Rel(coord, sdr_cap, "Sends tuning commands to")
+Rel(arb, sdr_cap, "Sends tuning commands to")
 Rel(dec_adsb, cache, "Updates live state data in")
 Rel(api, cache, "Queries live state data from")
 Rel(api, db, "Reads from and writes to")
 Rel(ui, api, "Interacts with", "HTTP/WebSocket")
-Rel(api, ext_api, "Delegates external requests to")
-Rel(ext_api, msg_bus, "Publishes processed data to")
