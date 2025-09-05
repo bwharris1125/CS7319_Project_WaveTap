@@ -15,9 +15,9 @@ CS7319_SW_Arch/
 │   ├── main.py       # Main application entry point
 │   └── README.md     # Source code documentation
 ├── tests/            # Unit and integration tests (pytest)
-├── instructions/     # Course assignment instructions and PDFs
-├── proposal/         # Project proposal documentation
-├── diagrams/         # System architecture diagrams (Mermaid)
+├── documentation/    # Documentation, diagrams and project instructions
+│   ├── diagrams/     # Mermaid source (.mmd)
+│   └── diagrams_output/ # Generated PNGs
 ├── tools/            # Utility scripts and tools
 │   └── adsb_rtlsdr_pymodes.py # ADS-B decoding utility
 ├── dev-env/          # Development environment configuration
@@ -97,7 +97,14 @@ python src/main.py
 The RTL-SDR functionality is located in `src/sdr/radio.py`. This module provides basic RTL-SDR configuration and testing capabilities.
 
 ### Diagrams
-System architecture diagrams are located in the `diagrams/` folder. Use the Mermaid VS Code extension to view or edit these diagrams.
+System architecture sources are located in `documentation/diagrams/` and generated images are stored in `documentation/diagrams_output/`.
+The repository includes a small helper script to render PNGs from the Mermaid sources:
+
+```bash
+bash documentation/generate_diagrams.sh
+```
+
+This script uses `mmdc` (mermaid-cli / puppeteer). If you see errors about missing Chrome/Chromium, install a system browser or set `PUPPETEER_EXECUTABLE_PATH` to the browser executable before running the script.
 
 _Additional usage examples and instructions will be added as the project develops._
 
