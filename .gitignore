@@ -1,5 +1,6 @@
 # Temp Files
 ~$*
+*.TMP
 
 # Python
 __pycache__/
