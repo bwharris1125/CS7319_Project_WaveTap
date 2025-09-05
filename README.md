@@ -1,10 +1,12 @@
 # WaveTap Project README (CS7319 - Software Architecture)
 
 Repository for SMU Software Architecture (Course CS7319) Class Project (WaveTap)
-<img src="documentation/wavetap_icon.png" alt="WaveTap Logo" width="200"/>
+<p align="left">
+   <img src="documentation/wavetap_icon.png" 
+   alt="WaveTap Logo" width="200"/>
+</p>
 
 ## Project Structure
-
 ```
 CS7319_SW_Arch/
 ├── src/              # Main source code for reusable modules
