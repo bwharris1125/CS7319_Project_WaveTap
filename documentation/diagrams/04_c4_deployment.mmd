@@ -10,6 +10,12 @@ Deployment_Node(edge, "Edge Host", "Linux") {
     }
 }
 
+Deployment_Node(local, "Local Windows Host", "Windows 10/11") {
+    Node(ui_dev, "UI Environment", "Python") {
+        Container(ui, "Local GUI", "Python", "Provides user interface for data visualization")
+    }
+}
+
 Deployment_Node(standalone, "Docker Server", "Linux") {
     Node(msg, "Message Bus", "NATS/Kafka") {
         Container(msg_bus, "Message Bus", "Handles IQ data streams")
@@ -35,11 +41,6 @@ Deployment_Node(standalone, "Docker Server", "Linux") {
     }
 }
 
-Deployment_Node(local, "Local Windows Host", "Windows 10/11") {
-    Node(ui_dev, "UI Environment", "Python") {
-        Container(ui, "Local GUI", "Python", "Provides user interface for data visualization")
-    }
-}
 
 Rel(rtlsdr, sdr_cap, "Captures signals for")
 Rel(sdr_cap, msg_bus, "Publishes IQ data to")

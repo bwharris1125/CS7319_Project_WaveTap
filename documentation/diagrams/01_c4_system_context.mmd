@@ -8,13 +8,13 @@ Boundary(b0, "Radio Frequencies") {
 }
 
 System_Boundary(b1, "WaveTap") {
-    System(wavetap, "WaveTap SDR Platform", "Processes and decodes RF signals")
     System(ui_service, "UI Service", "Provides user interface for data visualization")
     System(data_storage, "Data Storage Service", "Stores decoded data for analysis")
+    System(wavetap, "WaveTap SDR Platform", "Processes and decodes RF signals")
     Boundary(b2, "Hardware and Libraries") {
+        System(pymodes, "pyModeS", "Library for decoding ADS-B signals")
+        System(pyrtlsdr, "pyRTLSDR", "Library for interfacing with RTL-SDR")
         System(rtl_sdr, "RTL-SDR", "Hardware for capturing RF signals")
-        System(pyrtlsdr, "pyrtlsdr", "Library for interfacing with RTL-SDR")
-        System(pymodes, "pymodes", "Library for decoding ADS-B signals")
     }
 }
 

@@ -33,6 +33,7 @@ detect_chrome() {
             return 0
         fi
     done
+}
 
 detect_chrome
 
