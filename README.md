@@ -1,10 +1,7 @@
 # WaveTap Project README (CS7319 - Software Architecture)
 
 Repository for SMU Software Architecture (Course CS7319) Class Project (WaveTap)
-
-## Disclaimer
-
-AI assistance (GitHub Copilot) was used to help with documentation and environment setup for this project. Project code is to be primarily human-authored. Any use of AI assistants for code generation or other tasks will be clearly disclosed in relevant files or documentation sections.
+![WaveTap Logo](/documentation/wavetap_icon.png)
 
 ## Project Structure
 
@@ -164,6 +161,12 @@ This project is intended to be run exclusively on Linux or Windows Subsystem for
   ```
 
 You can now develop and run your project in a Linux environment using WSL, with all VS Code features.
+
+---
+
+### Disclaimer
+
+AI assistance (GitHub Copilot) was used to help with documentation and environment setup for this project. Project code is to be primarily human-authored. Any use of AI assistants for code generation or other tasks will be clearly disclosed in relevant files or documentation sections.
 
 ## License
 
