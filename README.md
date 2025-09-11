@@ -13,7 +13,10 @@ Repository for SMU Software Architecture (CS7319) Class Project
 ```
 CS7319_SW_Arch/
 ├── src/              # Main source code for reusable modules
-│   ├── sdr/          # Software Defined Radio modules
+│   ├── sdr_cap/      # SDR IQ capture and streaming modules
+│   │   ├── radio.py      # IQ streaming server
+│   │   ├── iq_client.py  # IQ streaming client library  
+│   │   └── examples.py   # Usage examples and CLI
 │   ├── main.py       # Main application entry point
 │   └── README.md     # Source code documentation
 ├── tests/            # Unit and integration tests (pytest)
@@ -24,6 +27,7 @@ CS7319_SW_Arch/
 │   └── adsb_rtlsdr_pymodes.py # ADS-B decoding utility
 ├── dev-env/          # Development environment configuration
 │   └── init_env.sh   # Environment setup script
+├── Dockerfile        # Container build configuration
 ├── pyproject.toml    # Project configuration
 ├── README.md         # Project documentation
 └── LICENSE           # Project license (MIT)
@@ -166,6 +170,31 @@ This project is intended to be run exclusively on Linux or Windows Subsystem for
   ```
 
 You can now develop and run your project in a Linux environment using WSL, with all VS Code features.
+
+## Docker Containerization
+
+The SDR IQ streaming server supports containerization with Docker for easy deployment and scaling. See **[DOCKER.md](DOCKER.md)** for complete containerization guide including:
+
+- **Quick Start**: Build and run containers
+- **Configuration**: Environment variables and settings
+- **Production Deployment**: Docker Compose and Kubernetes
+- **USB Device Access**: RTL-SDR hardware integration
+- **Multi-container Architecture**: Server/client separation
+
+### Quick Docker Start
+
+```bash
+# Build the container
+docker build -t sdr-iq-server .
+
+# Run with USB device access
+docker run -d --privileged -p 8080:8080 \
+  -e SDR_CENTER_FREQ=1090000000 \
+  sdr-iq-server
+
+# Or use Docker Compose
+docker-compose up -d sdr-server
+```
 
 ---
 
