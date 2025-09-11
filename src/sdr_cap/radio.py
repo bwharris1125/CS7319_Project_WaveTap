@@ -348,8 +348,8 @@ def main():
     # Create configurations
     sdr_config = SDRConfig(
         sample_rate=2.048e6,  # 2.048 MHz
-        # center_freq=1.090e9,  # 1090 MHz (ADS-B)
-        center_freq=96.3e6,  # 96.3 MHz (FM Radio)
+        center_freq=1.090e9,  # 1090 MHz (ADS-B)
+        # center_freq=96.3e6,  # 96.3 MHz (FM Radio)
         gain="auto",  # Auto gain
         buffer_size=262144,  # 256k samples per callback
     )
