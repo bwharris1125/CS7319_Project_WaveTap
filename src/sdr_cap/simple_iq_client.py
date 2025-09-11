@@ -1,3 +1,9 @@
+"""Simple IQ client for receiving IQ data packets from a TCP server.
+
+Connects to a specified host and port, receives a configurable number of IQ data
+packets, and prints information about each received packet.
+"""
+
 import os
 import socket
 import struct
