@@ -205,14 +205,11 @@ class IQStreamServer:
             self.stats["errors"] += 1
 
     def print_stats(self):
-        """Print streaming statistics periodically."""
-        while self.running:
-            time.sleep(10)  # Print stats every 10 seconds
-            if self.running:
-                self.logger.info(
-                    f"Stats - Samples: {self.stats['samples_sent']}, "
-                    f"Clients: {len(self.clients)}, Errors: {self.stats['errors']}"
-                )
+        """Print streaming statistics once."""
+        self.logger.info(
+            f"Stats - Samples: {self.stats['samples_sent']}, "
+            f"Clients: {len(self.clients)}, Errors: {self.stats['errors']}"
+        )
 
     def _sdr_streaming_worker(self):
         """Worker thread for SDR async streaming."""
@@ -243,11 +240,6 @@ class IQStreamServer:
             target=self.accept_clients, daemon=True
         )
         self.client_thread.start()
-
-        self.stats_thread = threading.Thread(
-            target=self.print_stats, daemon=True
-        )
-        self.stats_thread.start()
 
         # Start SDR streaming in a dedicated thread
         self.sdr_thread = threading.Thread(
@@ -296,7 +288,7 @@ class IQStreamServer:
                 self.logger.error(f"Failed to close SDR. Error: {e}")
 
         # Join other threads for clean shutdown (with timeout)
-        for tname in ["client_thread", "stats_thread"]:
+        for tname in ["client_thread"]:
             t = getattr(self, tname, None)
             if t and t.is_alive():
                 self.logger.info(
@@ -374,9 +366,15 @@ def main():
     try:
         if server_instance.start_streaming():
             print("Server started successfully. Press Ctrl+C to stop.")
-            # Keep main thread alive
+            # Main thread: keep alive and print stats every 10 seconds
+            last_stats = time.time()
+            stats_interval = 10
             while server_instance.running:
                 time.sleep(1)
+                now = time.time()
+                if now - last_stats >= stats_interval:
+                    server_instance.print_stats()
+                    last_stats = now
         else:
             print("Failed to start server")
 
