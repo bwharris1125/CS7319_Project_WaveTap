@@ -214,6 +214,18 @@ class IQStreamServer:
                     f"Clients: {len(self.clients)}, Errors: {self.stats['errors']}"
                 )
 
+    def _sdr_streaming_worker(self):
+        """Worker thread for SDR async streaming."""
+        try:
+            self.logger.info("Starting IQ data capture...")
+            self.sdr.read_samples_async(
+                callback=self.iq_callback,
+                num_samples=self.sdr_config.buffer_size,
+                context=None,
+            )
+        except Exception as e:
+            self.logger.error(f"Streaming error: {e}")
+
     def start_streaming(self):
         """Start the IQ streaming server."""
         self.logger.info("Starting IQ Stream Server...")
@@ -226,29 +238,22 @@ class IQStreamServer:
 
         self.running = True
 
-        # Start client acceptance thread
-        client_thread = threading.Thread(
+        # Start client acceptance & stats threads and stores reference
+        self.client_thread = threading.Thread(
             target=self.accept_clients, daemon=True
         )
-        client_thread.start()
+        self.client_thread.start()
 
-        # Start stats thread
-        stats_thread = threading.Thread(target=self.print_stats, daemon=True)
-        stats_thread.start()
+        self.stats_thread = threading.Thread(
+            target=self.print_stats, daemon=True
+        )
+        self.stats_thread.start()
 
-        try:
-            self.logger.info("Starting IQ data capture...")
-            # Start async sampling with callback
-            self.sdr.read_samples_async(
-                callback=self.iq_callback,
-                num_samples=self.sdr_config.buffer_size,
-                context=None,
-            )
-
-        except KeyboardInterrupt:
-            self.logger.info("Received interrupt signal")
-        except Exception as e:
-            self.logger.error(f"Streaming error: {e}")
+        # Start SDR streaming in a dedicated thread
+        self.sdr_thread = threading.Thread(
+            target=self._sdr_streaming_worker, daemon=True
+        )
+        self.sdr_thread.start()
 
         return True
 
@@ -257,18 +262,58 @@ class IQStreamServer:
         self.logger.info("Stopping IQ Stream Server...")
         self.running = False
 
-        # Stop SDR
+        # Stop SDR (cancel async read and close device)
         if self.sdr:
             try:
                 self.sdr.cancel_read_async()
+                # NOTE: "<LIBUSB_ERROR_INVALID_PARAM (-2)" expected here
+                # TODO: Handle expected error
+            except Exception as e:
+                self.logger.error(
+                    f"Failed to cancel SDR async read. Error: {e}"
+                )
+
+        # Join SDR thread for clean shutdown (with timeout)
+        join_timeout = 5
+        sdr_thread = getattr(self, "sdr_thread", None)
+        if sdr_thread and sdr_thread.is_alive():
+            self.logger.info(
+                f"Waiting for sdr_thread to exit (timeout {join_timeout}s)..."
+            )
+            sdr_thread.join(timeout=join_timeout)
+            if sdr_thread.is_alive():
+                self.logger.error(
+                    "sdr_thread did not exit in time. Forcing process exit to release SDR."
+                )
+                os._exit(0)
+
+        # Now close SDR device
+        if self.sdr:
+            try:
                 self.sdr.close()
+                self.logger.info("SDR closed.")
             except Exception as e:
                 self.logger.error(f"Failed to close SDR. Error: {e}")
+
+        # Join other threads for clean shutdown (with timeout)
+        for tname in ["client_thread", "stats_thread"]:
+            t = getattr(self, tname, None)
+            if t and t.is_alive():
+                self.logger.info(
+                    f"Waiting for {tname} to exit (timeout {join_timeout}s)..."
+                )
+                t.join(timeout=join_timeout)
+                if t.is_alive():
+                    self.logger.error(
+                        f"{tname} did not exit in time. Forcing process exit to release SDR."
+                    )
+                    os._exit(0)
 
         # Close client connections
         for client in self.clients:
             try:
                 client.close()
+                self.logger.info("Client connection closed.")
             except Exception as e:
                 self.logger.error(
                     f"Failed to close client connection. Error: {e}"
@@ -279,16 +324,20 @@ class IQStreamServer:
         if self.server_socket:
             try:
                 self.server_socket.close()
+                self.logger.info("Server socket closed.")
             except Exception as e:
                 self.logger.error(f"Failed to close server socket. Error: {e}")
 
-        self.logger.info("Server stopped")
+        self.logger.info("SDR Stream server stopped.")
 
 
 def signal_handler(signum, frame):
     """Handle shutdown signals gracefully."""
     global server_instance
     if server_instance:
+        server_instance.logger.debug(
+            f"Signal {signum} received, stopping server..."
+        )
         server_instance.stop_streaming()
 
 
@@ -307,7 +356,8 @@ def main():
     # Create configurations
     sdr_config = SDRConfig(
         sample_rate=2.048e6,  # 2.048 MHz
-        center_freq=1.090e9,  # 1090 MHz (ADS-B)
+        # center_freq=1.090e9,  # 1090 MHz (ADS-B)
+        center_freq=96.3e6,  # 96.3 MHz (FM Radio)
         gain="auto",  # Auto gain
         buffer_size=262144,  # 256k samples per callback
     )
