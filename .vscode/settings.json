@@ -5,9 +5,6 @@
     "python.linting.enabled": true,
     "python.linting.ruffEnabled": true,
     "python.linting.ruffPath": "${workspaceFolder}/.venv/bin/ruff",
-    "python.analysis.extraPaths": [
-        "${workspaceFolder}/.venv/lib/python3.12/site-packages"
-    ],
     "files.exclude": {
         "**/__pycache__": true,
         "**/.venv": true,

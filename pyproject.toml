@@ -1,6 +1,6 @@
 [tool.ruff]
 select = ["E", "F", "D"]
-ignore = ["D205", "D107", "D401", "E501"]
+ignore = ["D205", "D107", "D401", "E501", "D200"]
 line-length = 79
 
 [tool.ruff.pydocstyle]
