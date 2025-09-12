@@ -1,12 +1,13 @@
 """IQ Stream Client - Receives and processes IQ data from the streaming server."""
 
-import logging
 import socket
 import struct
 import time
 from typing import Optional
 
 import numpy as np
+
+from utilities.wave_tap_logger import get_wt_logger
 
 
 class IQStreamClient:
@@ -24,20 +25,8 @@ class IQStreamClient:
         self.running = False
         self.logger = self._setup_logging()
 
-    def _setup_logging(self) -> logging.Logger:
-        """Configure logging for the client."""
-        logger = logging.getLogger("IQStreamClient")
-        logger.setLevel(logging.INFO)
-
-        if not logger.handlers:
-            handler = logging.StreamHandler()
-            formatter = logging.Formatter(
-                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-            )
-            handler.setFormatter(formatter)
-            logger.addHandler(handler)
-
-        return logger
+    def _setup_logging(self):
+        return get_wt_logger("IQStreamClient")
 
     def connect(self) -> bool:
         """Connect to the IQ stream server."""
@@ -203,13 +192,12 @@ class IQStreamClient:
 
 def main():
     """Usage of the IQ stream client."""
-    # Example 1: Basic client
     client = IQStreamClient("localhost", 8080)
     print("Starting basic IQ stream client...")
     print("Press Ctrl+C to stop.")
 
     try:
-        client.start_receiving(max_samples=10)  # Process 10 batches then stop
+        client.start_receiving(max_samples=None)
     except KeyboardInterrupt:
         print("Client stopped.")
 
