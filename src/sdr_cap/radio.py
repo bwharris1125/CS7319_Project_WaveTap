@@ -349,8 +349,8 @@ def main():
     sdr_config = SDRConfig(
         sample_rate=2.048e6,  # 2.048 MHz
         center_freq=1.090e9,  # 1090 MHz (ADS-B)
-        gain="auto",  # Auto gain
-        buffer_size=262144,  # 256k samples per callback
+        gain=27,              # Fixed gain for better SNR
+        buffer_size=262144,   # 256k samples per callback
     )
 
     network_config = NetworkConfig(
