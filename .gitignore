@@ -46,6 +46,6 @@ htmlcov/
 *.db
 
 # Ignore sqlite artifacts created in src/database during tests/dev runs
-/src/database/*.db
-/src/database/*-wal
-/src/database/*-shm
+*.db
+*.db-wal
+*.db-shm
