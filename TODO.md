@@ -159,5 +159,9 @@ Effort: 2-4 hours
 
 ---
 
+## NOTE: WAL checkpointing on worker stop (future)
+It may be useful to have `DBWorker.stop()` perform an explicit WAL checkpoint (e.g. `PRAGMA wal_checkpoint(TRUNCATE)`) before closing the connection so test runs and short-lived DB files don't leave `-wal` and `-shm` artifacts around. This can be implemented later as a small, safe enhancement.
+
+
 # Suggested immediate next step
 I can implement Item 1 (Persistor interface and JSON `raw` storage) now — it's low risk and unblocks a bunch of follow-up work. Confirm and I'll start the change and run the tests.

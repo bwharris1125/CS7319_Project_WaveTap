@@ -2,6 +2,7 @@ import os
 import sqlite3
 import time
 import uuid
+from pathlib import Path
 
 from src.database.adsb_db import AircraftState, DBWorker
 
@@ -17,8 +18,11 @@ def test_aircraftstate_defaults():
 
 
 def test_dbworker_processes_tasks(tmp_path):
-    # create a temporary sqlite file
-    db_file = tmp_path / "test_adsb.db"
+    # place temporary sqlite file inside the project src/database folder so it
+    # lives alongside other DB artifacts during test runs
+    db_folder = Path(__file__).resolve().parents[2] / "src" / "database"
+    db_folder.mkdir(parents=True, exist_ok=True)
+    db_file = db_folder / f"test_adsb_{int(time.time() * 1000)}.db"
     db_path = str(db_file)
 
     worker = DBWorker(db_path=db_path)
@@ -74,9 +78,13 @@ def test_dbworker_processes_tasks(tmp_path):
         # stop worker and join
         worker.stop()
         worker.join(timeout=3.0)
-        # cleanup file
+        # cleanup file and WAL/SHM artifacts
         try:
             if os.path.exists(db_path):
                 os.remove(db_path)
+            for suffix in ("-wal", "-shm"):
+                p = db_path + suffix
+                if os.path.exists(p):
+                    os.remove(p)
         except Exception:
             pass
