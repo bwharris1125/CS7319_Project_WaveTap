@@ -18,11 +18,11 @@ from rtlsdr import RtlSdr
 class SDRConfig:
     """Configuration for SDR parameters."""
 
-    sample_rate: float = 2.048e6  # 2.048 MHz
-    center_freq: float = 1.09e9  # 1090 MHz (ADS-B)
-    gain: str | int = "auto"  # Auto gain or specific dB value
-    device_index: int = 0  # RTL-SDR device index
-    buffer_size: int = 262144  # Buffer size for IQ samples
+    sample_rate: float = 2.048e6    # 2.048 MHz
+    center_freq: float = 1.09e9     # 1090 MHz (ADS-B)
+    gain: str | int = "auto"        # Auto gain or specific dB value
+    device_index: int = 0           # RTL-SDR device index
+    buffer_size: int = 262144       # Buffer size for IQ samples
 
     @classmethod
     def from_env(cls) -> "SDRConfig":
