@@ -4,7 +4,7 @@ import time
 import uuid
 from pathlib import Path
 
-from src.database.adsb_db import AircraftState, DBWorker
+from database.adsb_db import AircraftState, DBWorker
 
 
 def test_aircraftstate_defaults():

@@ -9,11 +9,11 @@ from pyModeS.extra.tcpclient import TcpClient
 
 class ADSBClient(TcpClient):
     def __init__(self, host, port, data_type):
-        logging.info(f"Starting ADSBClient to {host}:{port} type={data_type}")
+        logging.info(f"Starting ADSBClient on {host}:{port}[{data_type}]")
         super(ADSBClient, self).__init__(host, port, data_type)
         self.aircraft_data = {}
 
-    def handle_messages(self, messages):
+    def handle_messages(self, messages: list[tuple[str, float]]) -> None:
         for msg, timestamp in messages:
             if len(msg) != 28:
                 continue
@@ -61,11 +61,11 @@ class ADSBClient(TcpClient):
                             "vertical_rate": velocity[2],
                             "type": velocity[3],
                         }
-                # Other typecodes can be added as needed
-                logging.debug(f"Updated aircraft {icao}")
+                # NOTE: Other typecodes can be added as needed
+                # logging.debug(f"Updated aircraft {icao}") # extremely verbose
 
-
-def print_aircraft_data(client, interval=3):
+# TODO: should this be part of the class?
+def print_aircraft_data(client, interval: int = 3) -> None:
     last_lines = 0
     while True:
         # Table header
@@ -94,7 +94,7 @@ def print_aircraft_data(client, interval=3):
         time.sleep(interval)
 
 
-def run_client():
+def run_client() -> None:
     host = "192.168.50.106"
     port = 30002
 
