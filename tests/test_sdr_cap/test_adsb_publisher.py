@@ -11,7 +11,7 @@ SRC_PORT = 30002
 DEST_PORT = 8443
 
 @pytest.mark.asyncio
-async def test_adsb_publisher_receives_and_decodes(monkeypatch):
+async def test_adsb_publisher_receives(monkeypatch):
     # Mock ADSBClient to provide predictable data
     class MockClient:
         aircraft_data = {"TEST123": {"callsign": "TEST", "altitude": 10000, "position": {"lat": 51.0, "lon": -0.1}}}

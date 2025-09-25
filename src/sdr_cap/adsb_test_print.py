@@ -3,7 +3,7 @@ import sys
 import threading
 import time
 
-from adsb_publisher import ADSBClient
+from sdr_cap.adsb_publisher import ADSBClient
 
 
 # TODO: should this be part of the class?
